@@ -139,6 +139,16 @@ footer p{max-width:80ch;margin:0 0 6px}
 .qr span{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
 .qr span::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
 .qr small{font-size:10.5px;color:#6b756f;margin-top:-5px}
+button.qr{border:0;font:inherit;cursor:pointer}
+.zbox{position:fixed;inset:0;z-index:60;background:rgba(10,13,12,.7);display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 16px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 16px) max(16px,env(safe-area-inset-left,0px))}
+.zcard{background:#fff;color:#1c2420;border-radius:20px;padding:22px 20px 18px;width:min(320px,100%);text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.zcard img{width:220px;max-width:100%;height:auto}
+.zcard p{margin:0;font-size:13.5px;line-height:1.5;color:#4a554f}
+.zcard b{color:#1c2420}
+.zcard .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.zcard a,.zcard button{font:600 13px var(--f-body);padding:9px 16px;border-radius:22px;text-decoration:none;cursor:pointer}
+.zcard a{background:#0068FF;color:#fff;border:0}
+.zcard button{background:transparent;border:1px solid #cfd6d1;color:#1c2420}
 .float{position:fixed;z-index:20;right:max(16px,calc(env(safe-area-inset-right,0px) + 12px));bottom:calc(env(safe-area-inset-bottom,0px) + 16px);background:var(--accent);color:var(--surface);border:0;box-shadow:var(--shadow);padding:11px 18px;border-radius:28px;font:600 14px var(--f-body);text-decoration:none}
 </style>
 </head>
@@ -176,7 +186,7 @@ footer p{max-width:80ch;margin:0 0 6px}
     <div class="cta">
       <p><strong>Muốn xem nhà nào?</strong>Quét mã hoặc bấm vào mã để nhắn cho mình, kèm số thứ tự ngôi nhà nhé.</p>
       <div class="qrs">
-        <a class="qr" style="--c:#0068FF" href="https://zaloapp.com/qr/p/1qgm0vftrrzz8" target="_blank" rel="noopener"><img src="img/qr-zalo.jpg" alt="Mã QR Zalo"><span>Zalo</span><small>quét hoặc bấm</small></a>
+        <button class="qr" type="button" id="zaloBtn" style="--c:#0068FF"><img src="img/qr-zalo.jpg" alt="Mã QR Zalo"><span>Zalo</span><small>quét hoặc bấm</small></button>
         <a class="qr" style="--c:#25D366" href="https://wa.me/qr/GTLDPZFUSSRYF1?s=r" target="_blank" rel="noopener"><img src="img/qr-whatsapp.jpg" alt="Mã QR WhatsApp"><span>WhatsApp</span><small>quét hoặc bấm</small></a>
       </div>
     </div>
@@ -190,6 +200,17 @@ footer p{max-width:80ch;margin:0 0 6px}
 </footer>
 
 <a class="float" href="#lien-he">Liên hệ xem nhà</a>
+
+<div class="zbox" id="zbox" hidden role="dialog" aria-modal="true" aria-label="Mã QR Zalo">
+  <div class="zcard">
+    <img src="img/qr-zalo.jpg" alt="Mã QR Zalo">
+    <p><b>Quét mã này bằng Zalo.</b><br>Đang xem trên điện thoại? Chụp màn hình, mở Zalo, chọn <b>Quét mã QR</b> rồi chọn ảnh vừa chụp.</p>
+    <div class="row">
+      <a href="https://zaloapp.com/qr/p/1qgm0vftrrzz8" target="_blank" rel="noopener">Thử mở Zalo</a>
+      <button type="button" id="zClose">Đóng</button>
+    </div>
+  </div>
+</div>
 
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Xem ảnh">
   <img id="lbImg" alt="">
@@ -424,6 +445,14 @@ lb.addEventListener("click", e => { if (e.target === lb) closeLb(); });
 document.addEventListener("keydown", e => { if (lb.hidden) return; if (e.key==="Escape") closeLb(); if (e.key==="ArrowRight") step(1); if (e.key==="ArrowLeft") step(-1); });
 let sx = null; lb.addEventListener("touchstart", e => sx = e.touches[0].clientX, {passive:true});
 lb.addEventListener("touchend", e => { if (sx===null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) step(dx<0?1:-1); sx = null; });
+
+// Mã QR Zalo phóng to
+const zbox = document.getElementById("zbox"), zBtn = document.getElementById("zaloBtn");
+const zClose = () => { zbox.hidden = true; zBtn.focus(); };
+zBtn.onclick = () => { zbox.hidden = false; document.getElementById("zClose").focus(); };
+document.getElementById("zClose").onclick = zClose;
+zbox.addEventListener("click", e => { if (e.target === zbox) zClose(); });
+document.addEventListener("keydown", e => { if (!zbox.hidden && e.key === "Escape") zClose(); });
 </script>
 </body>
 </html>
