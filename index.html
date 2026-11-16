@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tuyển tập nhà Paris</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Be+Vietnam+Pro:wght@400;500;600&display=swap">
+<style>
+/* Layout: một cột kiểu catalogue, mỗi nhà là một "lô" gồm gallery lớn bên trái, hồ sơ bên phải; xếp từ sang nhất xuống. */
+:root{
+  --bg:#eef0ec;          /* đá vôi Paris, hơi lạnh */
+  --surface:#f8f9f6;
+  --ink:#1c2420;
+  --muted:#5d6a63;
+  --line:#d3d9d3;
+  --accent:#2f4d3f;      /* xanh fontaine Wallace */
+  --brass:#9a7a3e;       /* đồng thau tay nắm cửa */
+  --chip:#e2e7e1;
+  --shadow:0 1px 2px rgba(20,30,25,.06),0 8px 24px rgba(20,30,25,.06);
+  --f-display:"Cormorant Garamond","Times New Roman",serif;
+  --f-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#131816;--surface:#1a201d;--ink:#e6ebe6;--muted:#9aa8a0;--line:#2c3631;--accent:#8fb8a2;--brass:#cfac6a;--chip:#232b27;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#131816;--surface:#1a201d;--ink:#e6ebe6;--muted:#9aa8a0;--line:#2c3631;--accent:#8fb8a2;--brass:#cfac6a;--chip:#232b27;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;text-wrap:balance;margin:0;letter-spacing:-.01em}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);font-weight:600}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+/* Header */
+header.top{padding-block:56px 28px}
+header.top h1{font-size:clamp(40px,6vw,68px);line-height:1.02;margin-top:10px}
+header.top h1 em{font-style:italic;color:var(--accent)}
+.lede{max-width:62ch;color:var(--muted);margin:18px 0 0;font-size:16px}
+.facts{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:26px;font-size:13px;color:var(--muted)}
+.facts b{display:block;font-family:var(--f-display);font-size:28px;color:var(--ink);font-weight:600;line-height:1.1}
+
+/* Index */
+.index{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding-block:18px;margin-bottom:24px}
+.index ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:2px 24px;counter-reset:n}
+.index li a{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:baseline;padding:7px 0;text-decoration:none;border-bottom:1px dotted var(--line);font-size:14px}
+.index li a:hover .nm{color:var(--accent)}
+.index .no{font-family:var(--f-display);color:var(--brass);font-size:17px;font-variant-numeric:tabular-nums}
+.index .nm{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.index .pr{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px}
+
+/* Listing */
+.house{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:32px;padding-block:44px;border-bottom:1px solid var(--line);scroll-margin-top:12px}
+.house:last-of-type{border-bottom:0}
+@media (max-width:860px){.house{grid-template-columns:minmax(0,1fr);gap:18px;padding-block:32px}}
+
+.gal{position:relative;min-width:0}
+.track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:6px;background:var(--chip);aspect-ratio:3/2;max-width:100%}
+.track::-webkit-scrollbar{display:none}
+.track img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:start;cursor:zoom-in;display:block}
+.nav{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.88);color:#1c2420;font-size:20px;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 10px rgba(0,0,0,.18);transition:opacity .2s}
+.nav:hover{background:#fff}
+.nav.prev{left:12px}.nav.next{right:12px}
+.nav[disabled]{opacity:0;pointer-events:none}
+.count{position:absolute;right:12px;bottom:12px;background:rgba(20,26,23,.72);color:#fff;font-size:12px;padding:3px 10px;border-radius:20px;font-variant-numeric:tabular-nums;pointer-events:none}
+.thumbs{display:flex;gap:6px;margin-top:8px;overflow-x:auto;scrollbar-width:thin;padding-bottom:4px}
+.thumbs button{flex:0 0 64px;height:44px;padding:0;border:2px solid transparent;border-radius:3px;overflow:hidden;cursor:pointer;background:var(--chip);opacity:.6;transition:opacity .2s,border-color .2s}
+.thumbs button.on{opacity:1;border-color:var(--brass)}
+.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+
+.info{min-width:0;display:flex;flex-direction:column;gap:16px}
+.rank{display:flex;align-items:center;gap:12px}
+.rank .num{font-family:var(--f-display);font-size:44px;line-height:1;color:var(--brass);font-variant-numeric:tabular-nums}
+.rank .loc{font-size:13px;color:var(--muted);line-height:1.4}
+.rank .loc strong{color:var(--ink);font-weight:600;display:block;font-size:14px}
+.info h2{font-size:clamp(26px,3vw,34px);line-height:1.1}
+.price{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 14px}
+.price .v{font-family:var(--f-display);font-size:32px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+.price .pm{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+dl.spec{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+dl.spec div{padding:10px 8px 10px 0}
+dl.spec div+div{padding-left:12px;border-left:1px solid var(--line)}
+dl.spec dt{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+dl.spec dd{margin:2px 0 0;font-weight:600;font-variant-numeric:tabular-nums}
+.extra{font-size:13.5px;color:var(--muted);margin:-6px 0 0}
+.extra span+span::before{content:" · "}
+.desc{margin:0;max-width:62ch}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;padding:3px 10px;border-radius:20px;background:var(--chip);color:var(--ink)}
+.tag.warn{background:transparent;border:1px solid var(--brass);color:var(--brass)}
+.transit{display:flex;flex-direction:column;gap:6px;font-size:13.5px}
+.transit .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ln{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 5px;border-radius:12px;font-size:12px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+.ln.rer{border-radius:5px}
+.ln.dark{color:#1c2420}
+.stn{color:var(--muted)}
+.note{font-size:12.5px;color:var(--muted);font-style:italic}
+
+/* Service */
+.service{background:var(--surface);border-top:1px solid var(--line);margin-top:20px}
+.service .wrap{padding-block:56px}
+.service h2{font-size:clamp(30px,4vw,44px)}
+.steps{list-style:none;margin:24px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:22px 28px;counter-reset:s}
+.steps li{counter-increment:s;border-top:2px solid var(--accent);padding-top:12px}
+.steps li::before{content:"Bước " counter(s);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--brass);font-weight:600}
+.steps h3{font-family:var(--f-body);font-size:15.5px;font-weight:600;margin:4px 0 4px}
+.steps p{margin:0;font-size:13px;color:var(--muted)}
+.cta{margin-top:36px;padding:22px 24px;border-radius:6px;background:var(--accent);color:var(--surface);display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;justify-content:space-between}
+.cta p{margin:0;max-width:60ch}
+.cta strong{font-family:var(--f-display);font-size:24px;font-weight:600;display:block}
+footer{padding-block:24px 88px;font-size:11.5px;color:var(--muted)}
+footer p{max-width:80ch;margin:0 0 6px}
+
+/* Lightbox */
+.lb{position:fixed;inset:0;z-index:50;background:rgba(10,13,12,.94);display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 48px) max(56px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 48px) max(56px,env(safe-area-inset-left,0px))}
+.lb img{max-width:100%;max-height:100%;object-fit:contain;border-radius:3px}
+.lb button{position:absolute;background:rgba(255,255,255,.12);color:#fff;border:0;width:46px;height:46px;border-radius:50%;font-size:22px;cursor:pointer}
+.lb button:hover{background:rgba(255,255,255,.24)}
+.lb .x{top:calc(env(safe-area-inset-top,0px) + 10px);right:max(10px,env(safe-area-inset-right,0px))}
+.lb .l{left:max(6px,env(safe-area-inset-left,0px));top:50%;transform:translateY(-50%)}
+.lb .r{right:max(6px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%)}
+.lb .cap{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);left:0;right:0;text-align:center;color:#cfd6d1;font-size:13px}
+@media (max-width:560px){.lb{padding-left:8px;padding-right:8px}.lb .l,.lb .r{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);transform:none}}
+@media (prefers-reduced-motion:reduce){.track{scroll-behavior:auto}*{transition:none!important}}
+
+/* Liên hệ */
+.hello{display:inline-flex;align-items:center;gap:8px;margin-top:22px;font-size:13.5px;color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--line);padding-bottom:2px}
+.hello:hover{color:var(--accent)}
+.hello .dot{width:8px;height:8px;border-radius:50%;background:var(--dot,#0068FF)}
+.qrs{display:flex;gap:18px;flex-wrap:wrap}
+.qr{--tilt:-3deg;display:flex;flex-direction:column;align-items:center;gap:7px;width:128px;padding:10px 10px 9px;background:#fff;border-radius:16px;text-decoration:none;color:#1c2420;box-shadow:0 6px 18px rgba(0,0,0,.18);transform:rotate(var(--tilt));transition:transform .25s ease}
+.qr:nth-child(2){--tilt:2.5deg}
+.qr:hover,.qr:focus-visible{transform:rotate(0) translateY(-3px)}
+.qr img{width:108px;height:108px;display:block;border-radius:6px}
+.qr span{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+.qr span::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+.qr small{font-size:10.5px;color:#6b756f;margin-top:-5px}
+.float{position:fixed;z-index:20;right:max(16px,calc(env(safe-area-inset-right,0px) + 12px));bottom:calc(env(safe-area-inset-bottom,0px) + 16px);background:var(--accent);color:var(--surface);border:0;box-shadow:var(--shadow);padding:11px 18px;border-radius:28px;font:600 14px var(--f-body);text-decoration:none}
+</style>
+</head>
+<body>
+
+<header class="top wrap">
+  <div class="eyebrow">Tuyển chọn · Paris · Tháng 11/2026</div>
+  <h1>Những ngôi nhà riêng<br>giữa lòng <em>Paris</em></h1>
+  <p class="lede">28 ngôi nhà đang rao bán ở Paris, nhiều nhất ở quận 16 (Auteuil, Passy, La Muette, Chaillot), cùng một số nhà ở quận 8, 12, 13, 14 và 15. Danh sách xếp từ nhà sang trọng nhất xuống nhà bình thường hơn. Bấm vào ảnh để xem toàn màn hình, vuốt hoặc dùng mũi tên để lướt.</p>
+  <div class="facts">
+    <div><b>28</b>ngôi nhà</div>
+    <div><b>1,05 - 5,35 tr €</b>khoảng giá</div>
+    <div><b>87 - 485 m²</b>diện tích</div>
+  </div>
+  <a class="hello" href="#lien-he"><span class="dot"></span><span class="dot" style="--dot:#25D366"></span>Nhắn mình qua Zalo hoặc WhatsApp</a>
+</header>
+
+<nav class="index wrap" aria-label="Danh sách nhà"><ol id="idx"></ol></nav>
+
+<main class="wrap" id="list"></main>
+
+<section class="service" id="lien-he">
+  <div class="wrap">
+    <div class="eyebrow">Dịch vụ đồng hành</div>
+    <h2>Mua nhà ở Pháp, có người Việt đi cùng</h2>
+    <p class="lede">Mình liên hệ agence, đi xem nhà cùng bạn và thông dịch Việt, Pháp ở mọi bước, từ lúc hỏi thông tin đến ngày nhận chìa khóa.</p>
+    <ol class="steps">
+      <li><h3>Liên hệ agence</h3><p>Hỏi thêm thông tin, xin hồ sơ nhà và đặt lịch xem.</p></li>
+      <li><h3>Đi xem nhà</h3><p>Đi cùng bạn, thông dịch trực tiếp, hỏi kỹ tình trạng nhà và chi phí.</p></li>
+      <li><h3>Trả giá</h3><p>Gửi offre bằng văn bản, thương lượng đến khi hai bên đồng ý.</p></li>
+      <li><h3>Ký compromis</h3><p>Dịch và giải thích hợp đồng cùng notaire. Có 10 ngày để suy nghĩ lại.</p></li>
+      <li><h3>Thanh toán</h3><p>Chuẩn bị giấy tờ và chuyển tiền qua tài khoản của notaire.</p></li>
+      <li><h3>Ký acte, nhận nhà</h3><p>Ký chính thức ở notaire, thường 2 đến 3 tháng sau compromis, rồi nhận chìa khóa.</p></li>
+    </ol>
+    <div class="cta">
+      <p><strong>Muốn xem nhà nào?</strong>Quét mã hoặc bấm vào mã để nhắn cho mình, kèm số thứ tự ngôi nhà nhé.</p>
+      <div class="qrs">
+        <a class="qr" style="--c:#0068FF" href="https://zaloapp.com/qr/p/1qgm0vftrrzz8" target="_blank" rel="noopener"><img src="img/qr-zalo.jpg" alt="Mã QR Zalo"><span>Zalo</span><small>quét hoặc bấm</small></a>
+        <a class="qr" style="--c:#25D366" href="https://wa.me/qr/GTLDPZFUSSRYF1?s=r" target="_blank" rel="noopener"><img src="img/qr-whatsapp.jpg" alt="Mã QR WhatsApp"><span>WhatsApp</span><small>quét hoặc bấm</small></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <p>Giá rao của agence. Mua nhà cũ trả thêm phí công chứng khoảng 7-8%.</p>
+  <p>"Pièces" gồm phòng khách và phòng ngủ. Metro là ga gần khu vực.</p>
+  <p>Thông tin từ tin rao công khai, có thể đã thay đổi.</p>
+</footer>
+
+<a class="float" href="#lien-he">Liên hệ xem nhà</a>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Xem ảnh">
+  <img id="lbImg" alt="">
+  <button class="x" id="lbX" aria-label="Đóng">✕</button>
+  <button class="l" id="lbL" aria-label="Ảnh trước">‹</button>
+  <button class="r" id="lbR" aria-label="Ảnh sau">›</button>
+  <div class="cap" id="lbCap"></div>
+</div>
+
+<script>
+const LINE = {
+  M1:["#FFCD00",1],M2:["#003CA6",0],M4:["#BE418D",0],M5:["#FF7E2E",1],M6:["#6ECA97",1],M7:["#FA9ABA",1],M8:["#E19BDF",1],
+  M9:["#B6BD00",1],M10:["#C9910D",1],M12:["#007852",0],
+  "RER A":["#E2231A",0],"RER B":["#5291CE",0],"RER C":["#FFCE00",1],T2:["#C04191",0],T3a:["#FF7E2E",1]
+};
+// t: [[tuyến...], "ga"]
+const H = [
+ {n:1,img:10,name:"Hôtel particulier 1910 trong hameau riêng",q:"Muette Sud",d:"Paris 16",price:5350000,m2:484.89,p:12,b:7,out:"Vườn 126 m² + sân thượng mái 123 m²",dpe:"E",
+  t:[[["M9"],"La Muette · Ranelagh"],[["RER C"],"Boulainvilliers"]],
+  tags:["Hameau có bảo vệ","Sân thượng 123 m²","Phòng billiard","Studio riêng"],
+  desc:"Biệt thự xây năm 1910 trong một khu hameau tư nhân có bảo vệ, xanh mát và cực kỳ yên tĩnh, nằm giữa Passy và Ranelagh. Tầng tiếp khách trần cao 3,30 m, giữ nguyên sàn gỗ, phào chỉ và lò sưởi. Có phòng billiard, studio cho người giúp việc với lối vào riêng, và sân thượng mái có cây nhìn thoáng ra xung quanh. Hợp với gia đình đông người và hay tiếp khách."},
+ {n:2,img:6,name:"Hôtel particulier có hồ bơi",q:"Porte Dauphine",d:"Paris 16",price:4900000,m2:470,p:9,b:6,out:"Vườn 70 m²",
+  t:[[["M9"],"Rue de la Pompe"],[["M2"],"Porte Dauphine"],[["RER C"],"Avenue Foch"]],
+  tags:["Hồ bơi","Phòng gym","2 chỗ đậu xe","Voie privée"],
+  desc:"Nằm trong một con đường tư nhân gần rue de la Pompe, hoàn toàn yên tĩnh. Điều rất hiếm ở Paris: có hồ bơi, phòng gym và bãi đậu 2 xe dưới hầm. Tầng trệt là phòng khách đôi mở ra vườn 70 m²; tầng 1 là suite master có phòng tắm và phòng thay đồ; tầng 2 có bốn phòng ngủ cho con. Có thể dùng làm văn phòng hoặc đại sứ quán.",
+  note:"Tin rao chỉ có 6 ảnh."},
+ {n:3,img:3,name:"Hôtel particulier 1920",q:"Auteuil Nord",d:"Paris 16",price:4490000,m2:300,p:8,b:5,out:"Đất 400 m², sân ngoài ~60 m²",
+  t:[[["M9"],"Jasmin · Ranelagh"]],
+  tags:["Agence độc quyền","2 chỗ đậu xe","Có thể làm văn phòng"],
+  desc:"Biệt thự xây năm 1920, mặt tiền vừa được làm mới, trong khung cảnh nhiều cây xanh của Auteuil. Phòng khách đôi có lò sưởi, bếp lớn riêng nhìn ra patio. Master bedroom có lò sưởi, phòng tắm và phòng thay đồ; tổng cộng 5-6 phòng ngủ, tầng hầm khô ráo. Đậu được 2 xe trong lối đi riêng. Thuộc phân tuyến trường Jean de La Fontaine.",
+  note:"Tin rao chỉ có 3 ảnh và là ảnh phối cảnh nội thất. Diện tích theo mô tả là 281 m²."},
+ {n:4,img:10,name:"Hôtel particulier 1860 có jardin d'hiver",q:"Auteuil Nord",d:"Paris 16",price:4250000,m2:300,p:8,b:6,out:"Đất 241 m², vườn + sân lát đá",
+  t:[[["M9"],"Jasmin · Ranelagh"],[["M10"],"Michel-Ange-Auteuil"]],
+  tags:["Jardin d'hiver","Studio riêng","Chỗ đậu xe","Nét cổ nguyên bản"],
+  desc:"Biệt thự cổ xây năm 1860 ở khu Suchet - Jasmin, gần đại lộ Mozart, trường học và cửa hàng. Giữ nhiều nét xưa: sàn gỗ, lò sưởi, trần cao. Một jardin d'hiver dưới mái kính nối sang nhà phụ có studio riêng; tầng hầm rộng có thể làm phòng chiếu phim hoặc phòng gym. Sân lát đá, vườn cây và chỗ đậu xe ngoài trời."},
+ {n:5,img:10,name:"Nhà 318 m² do kiến trúc sư cải tạo",q:"Muette Sud",d:"Paris 16",price:3500000,m2:318.44,p:10,b:3,out:"Veranda",dpe:"B",
+  t:[[["M9"],"La Muette"],[["M6"],"Passy"],[["RER C"],"Boulainvilliers"]],
+  tags:["DPE B","Điều hòa toàn nhà","Phòng gym","Veranda"],
+  desc:"Trên một con phố yên tĩnh nhiều cây, sát làng Passy và các trường có tiếng. Kiến trúc sư cải tạo toàn bộ, điều hòa khắp nhà. Bếp lớn mở ra phòng ăn và veranda đầy nắng. Suite master có hai phòng tắm riêng và phòng thay đồ lớn. Tầng souplex là khu tiếp khách sáng sủa có bếp và phòng tắm, có thể tách thành căn hộ độc lập; tầng hầm có phòng gym và hầm rượu."},
+ {n:6,img:6,name:"Nhà 320 m² có phòng chiếu phim",q:"Muette Nord",d:"Paris 16",price:3250000,m2:320,p:8,b:5,out:"Vườn, sân thượng 20 m²",
+  t:[[["M9"],"La Muette · Rue de la Pompe"],[["RER C"],"Boulainvilliers"]],
+  tags:["Phòng chiếu phim","2 chỗ đậu xe","Ở hoặc làm văn phòng"],
+  desc:"Nằm khuất sau một tòa nhà nên hoàn toàn yên tĩnh, được phép dùng để ở hoặc làm văn phòng. Phòng khách đôi mở ra vườn, bếp lớn có góc ăn. Tầng 1 là suite master và phòng làm việc; tầng 2 có bốn phòng ngủ cho con và sân thượng 20 m² nhìn xuống vườn. Tầng hầm có phòng chiếu phim, phòng chơi cho trẻ và 2 chỗ đậu xe. Có thể làm thêm sân thượng trên mái khoảng 57 m².",
+  note:"Tin rao chỉ có 6 ảnh."},
+ {n:7,img:10,name:"Nhà 300 m² có thang máy, làng Auteuil",q:"Auteuil Nord",d:"Paris 16",price:2995000,m2:300,p:9,b:5,out:"Jardin d'hiver 26 m² + sân hiên 25 m²",dpe:"D",
+  t:[[["M9","M10"],"Michel-Ange-Auteuil"],[["M10"],"Église d'Auteuil"]],
+  tags:["Thang máy","Garage + sạc xe điện","Hướng nam","Trường Jean-Baptiste Say"],
+  desc:"Nhà 4 tầng ngay làng Auteuil, có thang máy trong nhà, điều hòa và hướng nam. Tầng 2 là khu tiếp khách: phòng khách đôi có lò sưởi và ban công, bếp, phòng ăn mở ra jardin d'hiver và sân hiên. Mỗi phòng ngủ đều có phòng tắm riêng; tầng trên cùng là suite master. Garage có trụ sạc xe điện, tầng hầm có hầm rượu. Có thể mua thêm một box gần đó (70 000 €).",
+  note:"Nhà này được ba agence cùng rao."},
+ {n:8,img:10,name:"Hôtel particulier 1900, Villa de la Réunion",q:"Auteuil Sud",d:"Paris 16",price:2970000,m2:170.73,p:7,b:5,out:"Vườn ~42 m², ban công",dpe:"D",
+  t:[[["M10"],"Chardon-Lagache · Mirabeau"],[["M9","M10"],"Michel-Ange-Molitor"]],
+  tags:["Voie privée","Đã cải tạo toàn bộ","Garage","Hầm rượu"],
+  desc:"Nhà xây năm 1900 nhìn ra con đường tư nhân Villa de la Réunion, gần làng Auteuil. Cải tạo toàn bộ, không cần sửa gì thêm. Phòng khách trần cao 3,05 m; tầng 1 là phòng khách đôi xuyên sáng có ban công nhìn ra vườn, bếp có đảo. Studio rộng ở tầng dưới có lối ra vườn riêng. Có garage, phòng giặt, hầm rượu.",
+  note:"Diện tích Carrez 171 m², khoảng 224-228 m² sàn. Hai agence cùng rao."},
+ {n:9,img:10,name:"Nhà phố cạnh Khải Hoàn Môn",q:"Chaillot",d:"Paris 16",price:2800000,m2:162.6,p:6,b:3,out:"Sân hiên, sân trong có cây",dpe:"F",
+  t:[[["M1","M2","M6","RER A"],"Charles-de-Gaulle-Étoile"]],
+  tags:["Avenue Foch","Tòa nhà có người gác","Garage","Hầm rượu"],
+  desc:"Một ngôi nhà riêng nằm bên trong tòa nhà Haussmann có người gác, lối vào từ avenue Foch, ngay cạnh Khải Hoàn Môn. Nhà bao quanh một sân trong có cây nên kín đáo và yên tĩnh dù ở địa chỉ đắt giá bậc nhất Paris. 4 tầng, xuyên sáng. Phòng khách có lò sưởi mở ra sân hiên, bếp và phòng ăn đầy đủ nội thất. Garage vào từ rue Chalgrin."},
+ {n:10,img:10,name:"Pavillon Belle Époque giữa Étoile và Trocadéro",q:"Chaillot",d:"Paris 16",price:2370000,m2:129.81,p:5,b:3,out:"Sân lát đá riêng + sân thượng ~10 m²",dpe:"B",
+  t:[[["M6"],"Kléber · Boissière"],[["M1","M2","RER A"],"Étoile"]],
+  tags:["Cải tạo năm 2024","Sân riêng hướng nam","Sưởi sàn","2 chỗ đậu xe"],
+  desc:"Mặt tiền gạch và đá với mái hiên sắt kính, được cải tạo hoàn toàn năm 2024. Phòng khách 36 m² mở ra sân lát đá riêng hướng nam, giữ phào chỉ gốc, sàn gỗ xương cá và lò sưởi đá cẩm thạch đen. Bếp 29 m² dưới mái kính trời, trần gần 3,50 m. Suite master có bồn tắm đặt giữa phòng; hai phòng ngủ trên cùng mở ra sân thượng nhìn mái nhà Paris.",
+  note:"Hai agence cùng rao."},
+ {n:11,img:10,name:"Villa hiện đại với vườn 200 m²",q:"Auteuil Sud",d:"Paris 16",price:2530000,m2:143.37,p:5,b:3,out:"Vườn 200 m² dùng riêng + sân hiên",
+  t:[[["M9"],"Exelmans · Michel-Ange-Molitor"]],
+  tags:["Vườn 200 m²","Điều hòa","Mới cải tạo"],
+  desc:"Villa khuất tầm nhìn, mới cải tạo, cách nhiệt tốt và có điều hòa. Phòng khách và phòng ăn mở thẳng ra sân hiên và khu vườn 200 m², rất hiếm giữa Paris. Tầng trên có suite master với phòng thay đồ, thêm hai phòng ngủ và phòng tắm. Có thể mua thêm 2 chỗ đậu xe (35 000 €/chỗ) và một studio 24,82 m² mới sửa (260 000 €)."},
+ {n:12,img:10,name:"Nhà phố cuối thế kỷ 19",q:"Auteuil Sud",d:"Paris 16",price:2288000,m2:184.8,p:8,b:6,out:"Vườn 61 m² + sân trước 27 m²",dpe:"E",
+  t:[[["M9"],"Exelmans (5 phút đi bộ)"]],
+  tags:["Off-market","Nét cổ nguyên bản","Vườn hướng tây"],
+  desc:"Nhà phố xây cuối thế kỷ 19 trên một con phố rất yên tĩnh, gần vườn Serres d'Auteuil. Giữ nhiều chi tiết gốc: trần 3,10 m, sàn gỗ nguyên khối, ba lò sưởi đá cẩm thạch, gương viền vàng xưa và cầu thang gỗ đẹp. Phòng khách và phòng ăn gần 39 m² mở thẳng ra khu vườn hướng tây. Sáu phòng ngủ, hợp gia đình đông con."},
+ {n:13,img:10,name:"Duplex có sân thượng 40 m²",q:"Muette Sud",d:"Paris 16",price:2550000,m2:141,p:6,b:3,out:"Sân thượng 40 m² + ban công 12 m²",dpe:"D",
+  t:[[["M9"],"La Muette"],[["RER C"],"Boulainvilliers"]],
+  tags:["Căn hộ","Sân thượng 40 m²","Double box","Hầm"],
+  desc:"Căn hộ duplex trong một tòa nhà hiện đại xây năm 1990, có an ninh và lối đi cho người khuyết tật. Tầng dưới là phòng khách đôi 40 m² với ban công 12 m² và bếp có chỗ ăn. Tầng trên có 2-3 phòng ngủ mở ra sân thượng ngang sàn 40 m², cùng hai phòng tắm. Có hầm và garage đôi.",
+  warn:"Căn hộ, không phải nhà riêng"},
+ {n:14,img:10,name:"Nhà cuối ngõ lát đá",q:"La Muette · Passy",d:"Paris 16",price:2190000,m2:157,p:5,b:4,out:"Sân vườn 18 m²",dpe:"F",
+  t:[[["M9"],"La Muette"],[["RER C"],"Boulainvilliers"]],
+  tags:["Ngõ yên tĩnh","Mới cải tạo","Gác lửng"],
+  desc:"Nằm cuối một lối đi lát đá rợp cây, cảm giác như nhà ở quê giữa Paris. Mới cải tạo, 3 tầng. Tầng trệt có phòng khách 26 m² và bếp riêng. Tầng trên có hai phòng ngủ, mỗi phòng có gác lửng làm góc làm việc hoặc thư viện; tầng dưới thêm hai phòng ngủ sáng nhờ sân lõm. Có nhà phụ làm phòng giặt.",
+  note:"Diện tích sàn 157 m², Carrez 121 m². Hai agence cùng rao."},
+ {n:15,img:10,name:"Nhà trong sân, Place Rodin",q:"La Muette",d:"Paris 16",price:2090000,m2:190,p:5,b:3,out:"Sân riêng 20 m²",
+  t:[[["M9"],"Ranelagh · La Muette"],[["RER C"],"Avenue du Président Kennedy"]],
+  tags:["Lối vào riêng","Có thể làm văn phòng","Rất yên tĩnh"],
+  desc:"Ngôi nhà nằm trong sân của một tòa nhà cổ cao cấp ở Place Rodin, có lối vào riêng và sân 20 m². Tầng chính có phòng khách, bếp mở và phòng ăn rộng; tầng trên hai phòng ngủ và phòng tắm; tầng dưới là family room, có thể tăng lên 4 phòng ngủ. Có thể dùng cho mục đích nghề nghiệp. Đồng sở hữu nhỏ 10 lô, phí chung khoảng 1 600 €/năm.",
+  note:"Diện tích sàn 190 m², Carrez 155,31 m²."},
+ {n:16,img:10,name:"Nhà phố có vườn trong ngõ cụt",q:"Auteuil Sud",d:"Paris 16",price:1890000,m2:157.61,p:7,b:4,out:"Vườn 50 m²",dpe:"D",
+  t:[[["M9","M10"],"Michel-Ange-Molitor"],[["M10"],"Chardon-Lagache"]],
+  tags:["Vườn riêng","Điều hòa","Cải tạo 2020"],
+  desc:"Cuối một ngõ cụt có cây, kín đáo và rất yên tĩnh, gần cửa hàng và trường tốt. Cải tạo năm 2020, điều hòa hai chiều trong các phòng ngủ. Tầng trệt là phòng khách và bếp mở ra vườn. Tầng 1 có hai phòng ngủ cho con; tầng trên cùng là suite master có phòng làm việc và phòng thay đồ. Tầng hầm có family room, phòng giặt và một phòng ngủ khách có phòng tắm riêng.",
+  note:"Hai agence cùng rao."},
+ {n:17,img:8,name:"Xưởng vẽ nghệ sĩ gần tháp Eiffel",q:"Dupleix - Motte-Picquet",d:"Paris 15",price:1350000,m2:127.56,p:5,b:3,out:"Sân chung",dpe:"D",
+  t:[[["M6"],"Dupleix · Bir-Hakeim"],[["RER C"],"Champ de Mars - Tour Eiffel"]],
+  tags:["Mái kính","Phòng khách cao 2 tầng","Gần tháp Eiffel"],
+  desc:"Một xưởng vẽ nghệ sĩ cũ được cải thành nhà, dưới mái kính lớn, cách tháp Eiffel và bờ sông Seine vài bước. Phòng khách cao vút 67 m² như trong nhà thờ, cạnh bếp. Hai gác lửng có cầu thang riêng: một bên là ba phòng ngủ và hai phòng tắm, một bên là thư viện. Đồng sở hữu 55 lô, phí chung khoảng 2 680 €/năm."},
+ {n:18,img:10,name:"Nhà nhỏ trong villa có cổng",q:"Auteuil Sud",d:"Paris 16",price:1250000,m2:90,p:3,b:2,out:"Sân hiên 14 m²",dpe:"D",
+  t:[[["M9","M10"],"Michel-Ange-Molitor"],[["M10"],"Chardon-Lagache"]],
+  tags:["Villa có cổng an ninh","Kiến trúc sư cải tạo","Lối vào riêng"],
+  desc:"Ngôi nhà nhỏ hiếm có trong một con đường tư nhân lát đá, có cổng an ninh và nhiều cây. Kiến trúc sư cải tạo năm 2017 với vật liệu cao cấp và nhiều tủ âm tường. Phòng khách có lò sưởi mở ra sân hiên hướng tây, đón nắng cả buổi chiều. Tầng bán hầm có phòng ngủ với phòng tắm và lối vào riêng, tiện cho khách hoặc con lớn."},
+ {n:19,img:8,name:"Duplex trên vườn, cần thiết kế lại",q:"Auteuil Nord",d:"Paris 16",price:1770000,m2:212.79,p:5,b:1,out:"Vườn 21 m² + patio 7 m²",dpe:"C",
+  t:[[["M10"],"Église d'Auteuil"],[["M9","M10"],"Michel-Ange-Auteuil"]],
+  tags:["Làng Auteuil","Tự do thiết kế","Lối vào từ phố"],
+  desc:"Bất động sản hai tầng trong đồng sở hữu, ngay làng Auteuil, rất yên tĩnh. Tầng trên 92 m² xuyên sáng, cửa kính lớn nhìn ra vườn. Tầng trệt 112 m² hiện là phòng khám nha khoa. Không có tường chịu lực nên có thể thiết kế lại hoàn toàn thành nhà ở; có lối vào thẳng từ phố và tầng hầm 30 m². Hợp với người muốn tự cải tạo theo ý mình.",
+  warn:"Đang là phòng khám, cần cải tạo để ở"},
+ {f:"20",img:10,name:"Nhà thế kỷ 19 gắn với Bartholdi",q:"Mouton-Duvernet",d:"Paris 14",price:3150000,m2:298.97,p:8,b:5,out:"Vườn riêng 64,66 m²",dpe:"E",
+  t:[[["M4"],"Mouton-Duvernet"],[["M4","M6","RER B"],"Denfert-Rochereau"]],
+  tags:["Nhà độc lập, không đồng sở hữu","Vườn riêng","Agence độc quyền"],
+  desc:"Ngôi nhà thế kỷ 19 độc lập, không nằm trong đồng sở hữu, trên một con phố kín đáo của quận 14. Nhà có lịch sử đặc biệt: một số tác phẩm của nhà điêu khắc Bartholdi, tác giả tượng Nữ thần Tự do, từng được lưu giữ tại đây. Qua cổng là khu vườn có tre và cây mộc lan. Phòng khách có lò sưởi, phòng ăn và thư viện nối tiếp nhau dưới những khung cửa vòm lớn; bếp riêng; suite master ở tầng sát vườn.",
+  note:"Diện tích ở 298,97 m², tổng sàn 363,63 m²."},
+ {f:"21",img:10,name:"Nhà kiến trúc sư có rooftop xanh",q:"Butte-aux-Cailles",d:"Paris 13",price:2280000,m2:260,p:8,b:4,out:"Sân thượng mái trồng cây",dpe:"D",
+  t:[[["M6"],"Corvisart"],[["M5","M6","M7"],"Place d'Italie"]],
+  tags:["Xây năm 2006","Rooftop xanh","Phố yên tĩnh"],
+  desc:"Nhà hiện đại do kiến trúc sư xây năm 2006, ngay khu Butte-aux-Cailles nổi tiếng với những con phố nhỏ, quán ăn và không khí như một ngôi làng. Phòng khách có lò sưởi, bếp mở cao cấp, nhiều ánh sáng. Bốn phòng ngủ có tủ âm tường và cửa sổ lớn; suite master có phòng thay đồ, bồn tắm và vòi sen. Điểm đặc biệt là sân thượng trên mái trồng cây, rất hiếm ở Paris.",
+  note:"260 m² là tổng diện tích, đã tính 42 m² sân thượng."},
+ {f:"22",img:10,name:"Nhà gia đình cạnh công viên Montsouris",q:"Montsouris - Dareau",d:"Paris 14",price:1990000,m2:154,p:5,b:3,out:"2 sân hiên, hướng nam - tây",
+  t:[[["RER B"],"Cité Universitaire"],[["T3a"],"Montsouris"]],
+  tags:["Gần công viên","Patio trong nhà","Phòng làm việc riêng"],
+  desc:"Nhà trên một con phố yên tĩnh sát công viên Montsouris, gần trường học có tiếng và cửa hàng. Tầng trệt có bếp lớn mở ra phòng sinh hoạt và sân hiên hướng nam nhiều cây xanh. Tầng 1 là phòng khách đôi rộng với một patio trong nhà và tủ sách đóng sẵn. Tầng 2 dành riêng cho bố mẹ: phòng ngủ sáng, hai phòng thay đồ, phòng tắm có bồn và vòi sen, cùng một phòng làm việc riêng."},
+ {f:"23",img:10,name:"Nhà trong sân gần Champs-Élysées",q:"Saint-Philippe-du-Roule",d:"Paris 8",price:1890000,m2:124,p:5,b:3,out:"Sân trong yên tĩnh",dpe:"E",
+  t:[[["M9"],"Saint-Philippe-du-Roule"],[["M1","M9"],"Franklin D. Roosevelt"]],
+  tags:["Quận 8","Tòa nhà có người gác","Có thể làm văn phòng"],
+  desc:"Nhà 3 tầng trong sân yên tĩnh của một tòa nhà có người gác, khu Saint-Philippe-du-Roule, cách Champs-Élysées vài phút đi bộ. Tầng trệt có phòng khách, phòng ăn, bếp và WC. Tầng 1 có hai phòng ngủ, trong đó một suite có phòng thay đồ và phòng tắm; tầng 2 thêm một phòng ngủ có phòng tắm riêng. Có thể dùng làm văn phòng nghề tự do với lối vào riêng. Nhà trong tình trạng tốt, có hầm.",
+  note:"Thuế nhà đất 3 052 €/năm."},
+ {f:"24",img:10,name:"Villas Daumesnil, nhà mới xây",q:"Bel-Air - Daumesnil",d:"Paris 12",price:1050000,priceTo:1850000,m2:87,m2To:142,p:"4-6",b:"Tùy căn",out:"Vườn riêng 21-37 m²",dpe:"A",
+  t:[[["M6","M8"],"Daumesnil"],[["M6"],"Dugommier"]],
+  tags:["Nhà mới, vào ở ngay","Bơm nhiệt","Nhà thông minh"],
+  desc:"Dự án 5 ngôi nhà mới xây, đã hoàn thiện và có thể vào ở ngay, gần đại lộ Daumesnil và quảng trường Félix-Éboué. Còn 4 căn: 87 m² giá 1 050 000 €, 134 m² giá 1 620 000 €, 133 m² giá 1 630 000 € và 142 m² có thêm sân hiên 20 m² giá 1 850 000 €. Nhà nhiều cửa kính lớn, có vườn riêng, bơm nhiệt, hệ thống nhà thông minh và lam che nắng tự động. Cách rừng Vincennes 15 phút.",
+  note:"Mua nhà mới trực tiếp từ chủ đầu tư thì phí công chứng chỉ khoảng 2-3%, thấp hơn nhiều so với nhà cũ."},
+ {f:"25",img:10,name:"Nhà đầu thế kỷ 20 có vườn hướng nam",q:"Boucicaut - Convention",d:"Paris 15",price:1680000,m2:143.02,p:5,b:2,out:"Vườn 75 m² hướng nam",dpe:"B",
+  t:[[["M8"],"Boucicaut (250 m)"],[["M12"],"Convention"]],
+  tags:["Ngõ tư nhân","DPE B","Điều hòa"],
+  desc:"Nhà đầu thế kỷ 20 trong một ngõ tư nhân, rất yên tĩnh và không bị nhà nào nhìn sang, cách metro Boucicaut 250 m. Hướng nam, giữ lò sưởi cũ và có thêm điều hòa. Tầng trệt có phòng khách, veranda làm phòng ăn và bếp mở, tất cả nhìn ra khu vườn 75 m². Tầng 1 có phòng ngủ và phòng tắm; tầng trên cùng là không gian 27,73 m² dưới mái kính, có thể chia thành hai phòng ngủ. Hầm 26,60 m².",
+  note:"Diện tích Carrez 110,73 m²."},
+ {f:"26",img:10,name:"Nhà phố góc đường, Convention",q:"Convention - Porte de Versailles",d:"Paris 15",price:1388000,m2:140,p:5,b:2,out:"3 lối ra ngoài",dpe:"D",
+  t:[[["M12"],"Convention · Porte de Versailles"],[["T2","T3a"],"Porte de Versailles"]],
+  tags:["Ở kết hợp làm việc","Nhà góc, nhìn thoáng","Hầm đã hoàn thiện"],
+  desc:"Nhà phố độc đáo ở góc đường, nhìn thoáng, gần khu phố sầm uất của quận 15, được phép làm văn phòng cho nghề tự do. Tầng trệt có hai phòng ngủ, phòng tắm và phòng làm việc, có thể tách thành nơi làm việc riêng. Tầng 1 là phòng khách và phòng ăn hơn 33 m² quanh lò sưởi, bếp bán mở. Tầng hầm đã hoàn thiện có phòng đa năng 29 m², phòng tắm và phòng giặt.",
+  note:"Carrez 91,47 m², tổng sàn 183,26 m²."},
+ {f:"27",img:10,name:"Nhà 3 suite có phòng chiếu phim",q:"Petit-Montrouge",d:"Paris 14",price:1080000,m2:120,p:5,b:3,out:"Sân trong có cây",dpe:"E",
+  t:[[["M4"],"Alésia · Mouton-Duvernet"],[["T3a"],"Porte d'Orléans"]],
+  tags:["Cải tạo 2026","3 suite","2 chỗ đậu xe","Phòng chiếu phim"],
+  desc:"Nhà phố độc lập trong một khu đồng sở hữu ở Petit-Montrouge, vừa cải tạo toàn bộ tháng 3/2026, không cần sửa gì. Ba phòng ngủ, mỗi phòng có phòng tắm và WC riêng. Phòng khách, phòng ăn và bếp mở ở tầng trên, kèm góc làm việc. Tầng hầm có phòng chiếu phim riêng và phòng giặt. Điều hòa hai chiều, nhìn ra sân trong có cây, rất yên tĩnh. Có 2 chỗ đậu xe.",
+  note:"98 m² ở + 25 m² tầng hầm."},
+ {f:"28",img:8,name:"Nhà văn phòng 296 m², có thể chuyển thành nhà ở",q:"Bel-Air Nord",d:"Paris 12",price:2100000,m2:296,p:10,b:"-",out:"Mái kính, gác mái, hầm",dpe:"C",
+  t:[[["M6"],"Bel-Air · Daumesnil"],[["M1","M6"],"Nation"]],
+  tags:["Nhà độc lập","Phố nửa đi bộ","Mái kính"],
+  desc:"Nhà phố độc lập 3 tầng, hiện dùng làm văn phòng, trên một con phố nửa đi bộ yên tĩnh, gần cửa hàng, phương tiện công cộng và công viên. Diện tích sử dụng 230,81 m², sàn 296,66 m². Hiện có phòng họp dưới mái kính, 10 phòng làm việc, 3 khu vệ sinh, nhiều chỗ chứa đồ, gác mái và hầm. Muốn ở thì cần xin đổi mục đích sử dụng và cải tạo lại.",
+  warn:"Đang là văn phòng, cần đổi mục đích để ở"}
+];
+// Thứ tự hiển thị: từ sang nhất tới bình thường nhất (theo tên thư mục ảnh)
+const ORDER = ["01","02","03","04","05","06","20","07","08","09","10","11","21","12","13","14","15","22","23","16","24","25","17","26","27","18","28","19"];
+H.forEach(h => { if (!h.f) h.f = String(h.n).padStart(2,"0"); });
+H.sort((a,b) => ORDER.indexOf(a.f) - ORDER.indexOf(b.f));
+H.forEach((h,i) => h.n = i+1);
+
+const eur = v => v.toLocaleString("fr-FR").replace(/ | /g," ") + " €";
+const short = v => (v/1e6).toLocaleString("vi-VN",{maximumFractionDigits:2}) + " tr €";
+const m2f = v => v.toLocaleString("fr-FR",{maximumFractionDigits:2}).replace(/ | /g," ") + " m²";
+const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pad = n => String(n).padStart(2,"0");
+const src = (h,i) => `img/${h.f}/${i}.jpg`;
+const cp = h => "750" + h.d.replace(/\D/g,"").padStart(2,"0");
+const nf = v => v.toLocaleString("fr-FR").replace(/ | /g," ");
+
+document.getElementById("idx").innerHTML = H.map(h =>
+  `<li><a href="#nha-${h.n}"><span class="no">${h.n}</span><span class="nm">${esc(h.name)}</span><span class="pr">${h.priceTo?"từ ":""}${short(h.price)}</span></a></li>`).join("");
+
+const lineChip = l => { const [c,dark] = LINE[l]; const lab = l.startsWith("RER") ? l.slice(4) : l.slice(1);
+  return `<span class="ln${l.startsWith("RER")?" rer":""}${dark?" dark":""}" style="background:${c}" title="${l}">${l.startsWith("RER")?"RER "+lab:lab}</span>`; };
+
+document.getElementById("list").innerHTML = H.map(h => {
+  const imgs = Array.from({length:h.img},(_,i)=>i+1);
+  const ppm = Math.round(h.price/h.m2);
+  return `<article class="house" id="nha-${h.n}" data-n="${h.n}">
+    <div class="gal">
+      <div class="track" tabindex="0" aria-label="Ảnh nhà số ${h.n}">
+        ${imgs.map(i=>`<img src="${src(h,i)}" alt="${esc(h.name)} - ảnh ${i}" ${i>2?'loading="lazy"':''} data-i="${i-1}">`).join("")}
+      </div>
+      <button class="nav prev" aria-label="Ảnh trước" disabled>‹</button>
+      <button class="nav next" aria-label="Ảnh sau">›</button>
+      <span class="count">1 / ${h.img}</span>
+      <div class="thumbs">${imgs.map(i=>`<button aria-label="Ảnh ${i}" data-i="${i-1}" class="${i===1?"on":""}"><img src="${src(h,i)}" alt="" loading="lazy"></button>`).join("")}</div>
+    </div>
+    <div class="info">
+      <div class="rank"><span class="num">${pad(h.n)}</span><span class="loc"><strong>${esc(h.q)}</strong>${h.d} · ${cp(h)}</span></div>
+      <h2>${esc(h.name)}</h2>
+      <div class="price">${h.priceTo
+        ? `<span class="v">${nf(h.price)} - ${eur(h.priceTo)}</span><span class="pm">≈ 12 000 - 13 000 €/m²</span>`
+        : `<span class="v">${eur(h.price)}</span><span class="pm">≈ ${nf(ppm)} €/m²</span>`}</div>
+      <dl class="spec">
+        <div><dt>Diện tích</dt><dd>${h.m2To ? nf(h.m2)+" - "+m2f(h.m2To) : m2f(h.m2)}</dd></div>
+        <div><dt>Số phòng</dt><dd>${h.p} pièces</dd></div>
+        <div><dt>Phòng ngủ</dt><dd>${h.b}</dd></div>
+      </dl>
+      <p class="extra"><span>${esc(h.out)}</span>${h.dpe?`<span>Năng lượng DPE ${h.dpe}</span>`:""}</p>
+      <p class="desc">${esc(h.desc)}</p>
+      <div class="tags">${h.warn?`<span class="tag warn">${esc(h.warn)}</span>`:""}${h.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
+      <div class="transit">${h.t.map(([ls,st])=>`<div class="row">${ls.map(lineChip).join("")}<span class="stn">${esc(st)}</span></div>`).join("")}</div>
+      ${h.note?`<div class="note">${esc(h.note)}</div>`:""}
+    </div>
+  </article>`;
+}).join("");
+
+// Gallery behaviour
+document.querySelectorAll(".house").forEach(art => {
+  const track = art.querySelector(".track"), prev = art.querySelector(".prev"), next = art.querySelector(".next"),
+        count = art.querySelector(".count"), thumbs = [...art.querySelectorAll(".thumbs button")], total = thumbs.length;
+  let cur = 0;
+  const go = i => { i = Math.max(0, Math.min(total-1, i)); track.scrollTo({left: i*track.clientWidth, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); };
+  const sync = () => { const i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth)); if (i === cur && count.dataset.init) return; cur = i; count.dataset.init = 1;
+    count.textContent = `${i+1} / ${total}`; prev.disabled = i === 0; next.disabled = i === total-1;
+    thumbs.forEach((b,k)=>b.classList.toggle("on", k===i)); const t = thumbs[i]; if (t) t.parentElement.scrollTo({left: t.offsetLeft - t.parentElement.clientWidth/2 + 32, behavior:"smooth"}); };
+  track.addEventListener("scroll", () => requestAnimationFrame(sync), {passive:true});
+  prev.onclick = () => go(cur-1); next.onclick = () => go(cur+1);
+  thumbs.forEach((b,k)=> b.onclick = () => go(k));
+  track.addEventListener("keydown", e => { if (e.key==="ArrowRight") {e.preventDefault(); go(cur+1);} if (e.key==="ArrowLeft") {e.preventDefault(); go(cur-1);} });
+  track.querySelectorAll("img").forEach(img => img.onclick = () => openLb(+art.dataset.n, +img.dataset.i));
+  if (total < 2) { next.disabled = true; }
+});
+
+// Lightbox
+const lb = document.getElementById("lb"), lbImg = document.getElementById("lbImg"), lbCap = document.getElementById("lbCap");
+let lbH = null, lbI = 0, lastFocus = null;
+function showLb(){ lbImg.src = src(lbH, lbI+1); lbImg.alt = `${lbH.name} - ảnh ${lbI+1}`; lbCap.textContent = `${pad(lbH.n)} · ${lbH.name}, ${lbI+1} / ${lbH.img}`; }
+function openLb(n,i){ lbH = H.find(h=>h.n===n); lbI = i; lastFocus = document.activeElement; showLb(); lb.hidden = false; document.body.style.overflow = "hidden"; document.getElementById("lbX").focus(); }
+function closeLb(){ lb.hidden = true; document.body.style.overflow = ""; if (lastFocus) lastFocus.focus(); }
+const step = d => { lbI = (lbI + d + lbH.img) % lbH.img; showLb(); };
+document.getElementById("lbX").onclick = closeLb;
+document.getElementById("lbL").onclick = () => step(-1);
+document.getElementById("lbR").onclick = () => step(1);
+lb.addEventListener("click", e => { if (e.target === lb) closeLb(); });
+document.addEventListener("keydown", e => { if (lb.hidden) return; if (e.key==="Escape") closeLb(); if (e.key==="ArrowRight") step(1); if (e.key==="ArrowLeft") step(-1); });
+let sx = null; lb.addEventListener("touchstart", e => sx = e.touches[0].clientX, {passive:true});
+lb.addEventListener("touchend", e => { if (sx===null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) step(dx<0?1:-1); sx = null; });
+</script>
+</body>
+</html>
